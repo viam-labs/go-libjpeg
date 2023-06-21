@@ -1,4 +1,4 @@
-// Package util contains utility code for demosntration of go-libjpeg.
+// Package util contains utility code for demonstrations of go-libjpeg.
 package util
 
 import (

@@ -4,15 +4,15 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"github.com/viam-labs/go-libjpeg/jpeg"
+	"github.com/viam-labs/go-libjpeg/test/util"
+	"go.viam.com/test"
 	"image"
 	"image/color"
 	nativeJPEG "image/jpeg"
 	"io/ioutil"
 	"os"
 	"testing"
-
-	"github.com/viam-labs/go-libjpeg/jpeg"
-	"github.com/viam-labs/go-libjpeg/test/util"
 )
 
 var naturalImageFiles = []string{
@@ -99,10 +99,8 @@ func TestDecode(t *testing.T) {
 		fmt.Printf(" - test: %s\n", file)
 
 		img, err := jpeg.Decode(io, &jpeg.DecoderOptions{})
-		if err != nil {
-			t.Errorf("Got Error: %v", err)
-		}
-
+		test.That(t, err, test.ShouldBeNil)
+		test.That(t, img, test.ShouldNotBeNil)
 		util.WritePNG(img, fmt.Sprintf("TestDecode_%s.png", file))
 	}
 }
@@ -113,16 +111,10 @@ func TestDecodeScaled(t *testing.T) {
 		fmt.Printf(" - test: %s\n", file)
 
 		img, err := jpeg.Decode(io, &jpeg.DecoderOptions{ScaleTarget: image.Rect(0, 0, 100, 100)})
-		if err != nil {
-			t.Errorf("Got Error: %v", err)
-		}
-		if got := img.Bounds().Dx(); got != 256 {
-			t.Errorf("Wrong scaled width: %v, expect: 128 (=1024/8)", got)
-		}
-		if got := img.Bounds().Dy(); got != 192 {
-			t.Errorf("Wrong scaled height: %v, expect: 192 (=768/8)", got)
-		}
-
+		test.That(t, err, test.ShouldBeNil)
+		test.That(t, img.Bounds().Dx(), test.ShouldEqual, 256)
+		test.That(t, img.Bounds().Dy(), test.ShouldEqual, 192)
+		test.That(t, img, test.ShouldNotBeNil)
 		util.WritePNG(img, fmt.Sprintf("TestDecodeScaled_%s.png", file))
 	}
 }
@@ -137,11 +129,8 @@ func TestDecodeIntoRGBA(t *testing.T) {
 		fmt.Printf(" - test: %s\n", file)
 
 		img, err := jpeg.DecodeIntoRGBA(io, &jpeg.DecoderOptions{})
-		if err != nil {
-			t.Errorf("Got Error: %v", err)
-			continue
-		}
-
+		test.That(t, err, test.ShouldBeNil)
+		test.That(t, img, test.ShouldNotBeNil)
 		util.WritePNG(img, fmt.Sprintf("TestDecodeIntoRGBA_%s.png", file))
 	}
 }
@@ -156,16 +145,11 @@ func TestDecodeScaledIntoRGBA(t *testing.T) {
 		fmt.Printf(" - test: %s\n", file)
 
 		img, err := jpeg.DecodeIntoRGBA(io, &jpeg.DecoderOptions{ScaleTarget: image.Rect(0, 0, 100, 100)})
-		if err != nil {
-			t.Errorf("Got Error: %v", err)
-			continue
-		}
-		if got := img.Bounds().Dx(); got != 256 {
-			t.Errorf("Wrong scaled width: %v, expect: 128 (=1024/8)", got)
-		}
-		if got := img.Bounds().Dy(); got != 192 {
-			t.Errorf("Wrong scaled height: %v, expect: 192 (=768/8)", got)
-		}
+		test.That(t, err, test.ShouldBeNil)
+		test.That(t, img, test.ShouldNotBeNil)
+
+		test.That(t, img.Bounds().Dx(), test.ShouldEqual, 256)
+		test.That(t, img.Bounds().Dy(), test.ShouldEqual, 192)
 
 		util.WritePNG(img, fmt.Sprintf("TestDecodeIntoRGBA_%s.png", file))
 	}
@@ -177,15 +161,11 @@ func TestDecodeScaledIntoRGB(t *testing.T) {
 		fmt.Printf(" - test: %s\n", file)
 
 		img, err := jpeg.DecodeIntoRGB(io, &jpeg.DecoderOptions{ScaleTarget: image.Rect(0, 0, 100, 100)})
-		if err != nil {
-			t.Errorf("Got Error: %v", err)
-		}
-		if got := img.Bounds().Dx(); got != 256 {
-			t.Errorf("Wrong scaled width: %v, expect: 128 (=1024/8)", got)
-		}
-		if got := img.Bounds().Dy(); got != 192 {
-			t.Errorf("Wrong scaled height: %v, expect: 192 (=768/8)", got)
-		}
+		test.That(t, err, test.ShouldBeNil)
+		test.That(t, img, test.ShouldNotBeNil)
+
+		test.That(t, img.Bounds().Dx(), test.ShouldEqual, 256)
+		test.That(t, img.Bounds().Dy(), test.ShouldEqual, 192)
 
 		util.WritePNG(img, fmt.Sprintf("TestDecodeIntoRGB_%s.png", file))
 	}
@@ -197,9 +177,8 @@ func TestDecodeSubsampledImage(t *testing.T) {
 		fmt.Printf(" - test: %s\n", file)
 
 		img, err := jpeg.Decode(io, &jpeg.DecoderOptions{})
-		if err != nil {
-			t.Errorf("Got Error: %v", err)
-		}
+		test.That(t, err, test.ShouldBeNil)
+		test.That(t, img, test.ShouldNotBeNil)
 
 		util.WritePNG(img, fmt.Sprintf("TestDecodeSubsampledImage_%s.png", file))
 	}
@@ -211,9 +190,8 @@ func TestDecodeAndEncode(t *testing.T) {
 		fmt.Printf(" - test: %s\n", file)
 
 		img, err := jpeg.Decode(io, &jpeg.DecoderOptions{})
-		if err != nil {
-			t.Errorf("Decode returns error: %v", err)
-		}
+		test.That(t, err, test.ShouldBeNil)
+		test.That(t, img, test.ShouldNotBeNil)
 
 		// Create output file
 		f, err := os.Create(util.GetOutFilePath(fmt.Sprintf("TestDecodeAndEncode_%s", file)))
@@ -226,9 +204,8 @@ func TestDecodeAndEncode(t *testing.T) {
 			f.Close()
 		}()
 
-		if err := jpeg.Encode(w, img, &jpeg.EncoderOptions{Quality: 90}); err != nil {
-			t.Errorf("%s: Encode returns error: %v", file, err)
-		}
+		err = jpeg.Encode(w, img, &jpeg.EncoderOptions{Quality: 90})
+		test.That(t, err, test.ShouldBeNil)
 	}
 }
 
@@ -238,24 +215,19 @@ func TestDecodeAndEncodeSubsampledImages(t *testing.T) {
 		fmt.Printf(" - test: %s\n", file)
 
 		img, err := jpeg.Decode(r, &jpeg.DecoderOptions{})
-		if err != nil {
-			t.Errorf("Decode returns error: %v", err)
-		}
+		test.That(t, err, test.ShouldBeNil)
 
 		// Create output file
 		f, err := os.Create(util.GetOutFilePath(fmt.Sprintf("TestDecodeAndEncodeSubsampledImages_%s", file)))
-		if err != nil {
-			panic(err)
-		}
+		test.That(t, err, test.ShouldBeNil)
 		w := bufio.NewWriter(f)
 		defer func() {
 			w.Flush()
 			f.Close()
 		}()
 
-		if err := jpeg.Encode(w, img, &jpeg.EncoderOptions{Quality: 90}); err != nil {
-			t.Errorf("Encode returns error: %v", err)
-		}
+		err = jpeg.Encode(w, img, &jpeg.EncoderOptions{Quality: 90})
+		test.That(t, err, test.ShouldBeNil)
 	}
 }
 
@@ -272,17 +244,14 @@ func TestEncodeGrayImage(t *testing.T) {
 
 	// encode gray gradient
 	f, err := os.Create(util.GetOutFilePath(fmt.Sprintf("TestEncodeGrayImage_%dx%d.jpg", w, h)))
-	if err != nil {
-		panic(err)
-	}
+	test.That(t, err, test.ShouldBeNil)
 	wr := bufio.NewWriter(f)
 	defer func() {
 		wr.Flush()
 		f.Close()
 	}()
-	if err := jpeg.Encode(wr, img, &jpeg.EncoderOptions{Quality: 90}); err != nil {
-		t.Errorf("Encode returns error: %v", err)
-	}
+	err = jpeg.Encode(wr, img, &jpeg.EncoderOptions{Quality: 90})
+	test.That(t, err, test.ShouldBeNil)
 	wr.Flush()
 
 	// rewind to first
@@ -290,9 +259,7 @@ func TestEncodeGrayImage(t *testing.T) {
 
 	// decode file
 	decoded, err := jpeg.Decode(f, &jpeg.DecoderOptions{})
-	if err != nil {
-		t.Errorf("Decode returns error: %v", err)
-	}
+	test.That(t, err, test.ShouldBeNil)
 	for x := 0; x < w; x++ {
 		for y := 0; y < h; y++ {
 			r, g, b, _ := decoded.At(x, y).RGBA()
@@ -310,79 +277,46 @@ func TestDecodeConfig(t *testing.T) {
 		fmt.Printf(" - test: %s\n", file)
 
 		config, err := jpeg.DecodeConfig(r)
-		if err != nil {
-			t.Errorf("Got error: %v", err)
-		}
+		test.That(t, err, test.ShouldBeNil)
 
-		if got := config.ColorModel; got != color.YCbCrModel {
-			t.Errorf("got wrong ColorModel: %v, expect: color.YCbCrModel", got)
-		}
-		if got := config.Width; got != 1024 {
-			t.Errorf("got wrong width: %d, expect: 1024", got)
-		}
-		if got := config.Height; got != 768 {
-			t.Errorf("got wrong height: %d, expect: 768", got)
-		}
+		test.That(t, config.ColorModel, test.ShouldEqual, color.YCbCrModel)
+		test.That(t, config.Width, test.ShouldEqual, 1024)
+		test.That(t, config.Height, test.ShouldEqual, 768)
 	}
 }
 
 func TestNewYCbCrAlignedWithLandscape(t *testing.T) {
-	got := jpeg.NewYCbCrAligned(image.Rect(0, 0, 125, 25), image.YCbCrSubsampleRatio444)
+	img := jpeg.NewYCbCrAligned(image.Rect(0, 0, 125, 25), image.YCbCrSubsampleRatio444)
 
-	if len(got.Y) != 6912 {
-		t.Errorf("wrong array size Y: %d, expect: 6912", len(got.Y))
-	}
-	if len(got.Cb) != 6912 {
-		t.Errorf("wrong array size Cb: %d, expect: 6912", len(got.Cb))
-	}
-	if len(got.Cr) != 6912 {
-		t.Errorf("wrong array size Cr: %d, expect: 6912", len(got.Cr))
-	}
-	if got.YStride != 144 {
-		t.Errorf("got wrong YStride: %d, expect: 128", got.YStride)
-	}
-	if got.CStride != 144 {
-		t.Errorf("got wrong CStride: %d, expect: 128", got.CStride)
-	}
+	test.That(t, len(img.Y), test.ShouldResemble, 6912)
+	test.That(t, len(img.Cb), test.ShouldResemble, 6912)
+	test.That(t, len(img.Cr), test.ShouldResemble, 6912)
+	test.That(t, img.YStride, test.ShouldResemble, 144)
+	test.That(t, img.CStride, test.ShouldResemble, 144)
 }
 
 func TestNewYCbCrAlignedWithPortrait(t *testing.T) {
-	got := jpeg.NewYCbCrAligned(image.Rect(0, 0, 25, 125), image.YCbCrSubsampleRatio444)
+	img := jpeg.NewYCbCrAligned(image.Rect(0, 0, 25, 125), image.YCbCrSubsampleRatio444)
 
-	if len(got.Y) != 6912 {
-		t.Errorf("wrong array size Y: %d, expect: 6912", len(got.Y))
-	}
-	if len(got.Cb) != 6912 {
-		t.Errorf("wrong array size Cb: %d, expect: 6912", len(got.Cb))
-	}
-	if len(got.Cr) != 6912 {
-		t.Errorf("wrong array size Cr: %d, expect: 6912", len(got.Cr))
-	}
-	if got.YStride != 48 {
-		t.Errorf("got wrong YStride: %d, expect: 128", got.YStride)
-	}
-	if got.CStride != 48 {
-		t.Errorf("got wrong CStride: %d, expect: 128", got.CStride)
-	}
+	test.That(t, len(img.Y), test.ShouldResemble, 6912)
+	test.That(t, len(img.Cb), test.ShouldResemble, 6912)
+	test.That(t, len(img.Cr), test.ShouldResemble, 6912)
+	test.That(t, img.YStride, test.ShouldResemble, 48)
+	test.That(t, img.CStride, test.ShouldResemble, 48)
 }
 
 func TestDecodeFailsWithBlankFile(t *testing.T) {
 	blank := bytes.NewBuffer(nil)
 	_, err := jpeg.Decode(blank, &jpeg.DecoderOptions{})
-	if err == nil {
-		t.Errorf("got no error with blank file")
-	}
+	test.That(t, err, test.ShouldNotBeNil)
 }
 
 func TestEncodeFailsWithEmptyImage(t *testing.T) {
 	dummy := &image.YCbCr{}
 	w := bytes.NewBuffer(nil)
 	err := jpeg.Encode(w, dummy, &jpeg.EncoderOptions{})
-	if err == nil {
-		t.Errorf("got no error with empty image")
-	}
+	test.That(t, err, test.ShouldNotBeNil)
 }
-
 func newRGBA() *image.RGBA {
 	rgba := image.NewRGBA(image.Rect(0, 0, 4, 8))
 	for i := 0; i < 4; i++ {
@@ -403,16 +337,15 @@ func TestEncodeRGBA(t *testing.T) {
 	err := jpeg.Encode(w, rgba, &jpeg.EncoderOptions{
 		Quality: 100,
 	})
-	if err != nil {
-		t.Fatalf("failed to encode: %v", err)
-	}
+	test.That(t, err, test.ShouldBeNil)
 
 	decoded, err := jpeg.Decode(w, &jpeg.DecoderOptions{})
-	if err != nil {
-		t.Fatalf("failed to decode: %v", err)
-	}
+	test.That(t, err, test.ShouldBeNil)
+	//test.That(t, decoded, test.ShouldNotBeNil)
 
 	diff, err := util.MatchImage(rgba, decoded, 1)
+	test.That(t, err, test.ShouldBeNil)
+	test.That(t, diff, test.ShouldBeNil)
 	if err != nil {
 		t.Errorf("match image: %v", err)
 		util.WritePNG(rgba, "TestEncodeRGBA.want.png")
@@ -426,29 +359,21 @@ func TestDecodeAndEncodeRGBADisableFancyUpsampling(t *testing.T) {
 	src := image.NewRGBA(image.Rect(0, 0, 3000, 2000))
 
 	w, err := ioutil.TempFile("", "jpeg_test_")
-	if err != nil {
-		t.Fatalf("failed to create a file: %v", err)
-	}
+	test.That(t, err, test.ShouldBeNil)
 	name := w.Name()
 	defer os.Remove(w.Name())
 
 	err = jpeg.Encode(w, src, &jpeg.EncoderOptions{Quality: 95})
 	w.Close()
-	if err != nil {
-		t.Fatalf("faled to encode: %v", err)
-	}
+	test.That(t, err, test.ShouldBeNil)
 
 	r, err := os.Open(name)
-	if err != nil {
-		t.Fatalf("failed to open: %v", err)
-	}
+	test.That(t, err, test.ShouldBeNil)
 	defer r.Close()
 
 	_, err = jpeg.DecodeIntoRGBA(r, &jpeg.DecoderOptions{
 		DisableBlockSmoothing:  true,
 		DisableFancyUpsampling: true,
 	})
-	if err != nil {
-		t.Fatalf("failed to decode: %v", err)
-	}
+	test.That(t, err, test.ShouldBeNil)
 }
